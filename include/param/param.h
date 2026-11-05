@@ -119,7 +119,12 @@ typedef enum {
  */
 typedef struct param_s {
 	
-	uint64_t vaddr; /* Virtual address in case of VMEM */
+	/* _Alignas keeps the whole structure 8-aligned on a 32-bit target, where
+	 * a uint64_t is only 4-aligned and param_list.c's assertion would fail.
+	 * It changes no member offset and no record stride: ALIGN_UP(sizeof, 8)
+	 * already rounded the stride to the same 48 bytes on 32-bit and 80 on
+	 * 64-bit before this, so stored layouts are unaffected. */
+	_Alignas(8) uint64_t vaddr; /* Virtual address in case of VMEM */
 
 	uint16_t * node;
 	char *name;
