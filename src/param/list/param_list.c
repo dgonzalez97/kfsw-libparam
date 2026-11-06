@@ -367,7 +367,12 @@ typedef struct param_heap_s {
 	char help[150];
 } param_heap_t;
 
-static param_heap_t param_heap[PARAM_LIST_POOL] __attribute__ ((aligned (4))) __attribute__((section(".noinit")));
+/* aligned(4) here asked for less alignment than the type needs: param_t is
+ * 8-aligned and so is the uint64_t in the union above, so __alignof__ of this
+ * structure is 8. On a 32-bit target the attribute was honoured and the array
+ * landed on a 4-mod-8 address, which makes every member access through it a
+ * misaligned one. */
+static param_heap_t param_heap[PARAM_LIST_POOL] __attribute__ ((aligned (8))) __attribute__((section(".noinit")));
 static uint32_t param_heap_used = 0;
 
 /* Estimated average size of buffers */
